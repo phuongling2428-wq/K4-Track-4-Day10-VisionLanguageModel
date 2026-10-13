@@ -1,5 +1,5 @@
 Họ tên: Doan Phuong Linh
-`dataset_version`: <điền, lấy từ data/splits/meta.json>
+`dataset_version`: d10-21e4070301
 
 > Mã: `lab/` (labels, vlm, reward, viz, report_table) · test của tôi: `lab_tests/` · notebook: `lab_day10.ipynb`.
 > Bảng dưới sinh bằng `python -m lab.report_table` từ `report/evidence/*.json`.
@@ -61,11 +61,11 @@ Projector phải ở float32 vì (1) cập nhật Adam với lr 2e-4 thường n
 
 | Split | Ảnh | Phiên | pothole | crack | manhole |
 |---|---|---|---|---|---|
-| train | 1.422 | <điền> | 1.074 | 1.750 | 691 |
-| val | 276 | <điền> | 66 | 470 | 103 |
-| test | 311 | <điền> | 121 | 299 | 163 |
+| train | 1.422 | 13 | 1.074 | 1.750 | 691 |
+| val | 276 | 2 | 66 | 470 | 103 |
+| test | 311 | 3 | 121 | 299 | 163 |
 
-Hệ quả: val chỉ có 66 pothole nên F1 pothole trên val dao động mạnh; tôi dùng 40 ảnh val để gỡ lỗi và chỉ chấm test một lần cho mỗi setup.
+Không ảnh nào rỗng (mọi ảnh có ít nhất 1 box). Test chỉ gồm 3 phiên quay, nên 311 ảnh test thực chất là 3 đoạn đường, ít độc lập hơn con số 311 gợi ý. Hệ quả: val chỉ có 66 pothole nên F1 pothole trên val dao động mạnh; tôi dùng 40 ảnh val để gỡ lỗi và chỉ chấm test một lần cho mỗi setup.
 
 ### Câu 7 — So sánh E1/E2/E3: mở projector và LoRA trên ViT có đáng không (F1, CI95, VRAM, thời gian)?
 <điền: so sánh F1 ± CI95, VRAM đỉnh, phút giữa E1/E2/E3; kết luận setup nào đáng nhất>
