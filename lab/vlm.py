@@ -21,17 +21,30 @@ PROJECTOR_KEYS = ("visual.merger", "visual.deepstack_merger_list")
 EXTRA_FILE = "extra_trainable.pt"
 
 
+SKIP_MODULES = ["model.visual", "lm_head"]
+
+
 # ---------------------------------------------------------------- model
+def check_vit_not_quantized(model):
+    """Dừng ngay nếu có Linear 4-bit nào trong ViT/projector (dấu hiệu skip-modules không khớp)."""
+    bad = [n for n, m in model.named_modules() if "visual" in n and "4bit" in type(m).__name__]
+    if bad:
+        raise RuntimeError(f"{len(bad)} module ViT bị lượng tử 4-bit (vd. {bad[0]}): kiểm tra SKIP_MODULES")
+
+
 def load_model(model_id=MODEL_ID):
     from transformers import AutoProcessor, BitsAndBytesConfig, Qwen3VLForConditionalGeneration
 
     quant = BitsAndBytesConfig(
         load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16,
         bnb_4bit_use_double_quant=True,
-        # ViT (gồm cả projector) và lm_head giữ fp16: merger lượng tử 4-bit thì không huấn luyện đầy đủ được
-        llm_int8_skip_modules=["visual", "lm_head"])
+        # ViT (gồm cả projector) và lm_head giữ fp16: merger lượng tử 4-bit thì không huấn luyện đầy đủ được.
+        # transformers 5.x khớp tên bằng re.match (từ ĐẦU tên module), nên "visual" không khớp
+        # "model.visual.merger..." và cả ViT bị lượng tử: phải ghi đầy đủ tiền tố.
+        llm_int8_skip_modules=SKIP_MODULES)
     model = Qwen3VLForConditionalGeneration.from_pretrained(
         model_id, quantization_config=quant, dtype=torch.float16, device_map={"": 0})
+    check_vit_not_quantized(model)
     processor = AutoProcessor.from_pretrained(model_id)
     processor.tokenizer.padding_side = "left"
     return model, processor

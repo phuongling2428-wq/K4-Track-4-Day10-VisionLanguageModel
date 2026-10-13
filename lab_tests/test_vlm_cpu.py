@@ -95,3 +95,17 @@ def test_peft_trainable_counts(meta_model):
     assert 105e6 < counts["e2"] - counts["e1"] < 112e6
     assert counts["e3"] > counts["e2"]
     print(counts)
+
+
+def test_skip_modules_keep_whole_vit_unquantized(meta_model):
+    """Mẫu skip phải khớp mọi Linear trong ViT/projector theo đúng luật khớp của transformers."""
+    from transformers.quantizers.quantizers_utils import should_convert_module
+    from lab.vlm import SKIP_MODULES
+    linears = [n for n, m in meta_model.named_modules() if isinstance(m, torch.nn.Linear)]
+    vit = [n for n in linears if ".visual." in f".{n}"]
+    llm = [n for n in linears if "language_model" in n]
+    assert vit and not any(should_convert_module(n, SKIP_MODULES) for n in vit)
+    assert not should_convert_module("lm_head", SKIP_MODULES)
+    assert all(should_convert_module(n, SKIP_MODULES) for n in llm)  # LLM vẫn 4-bit
+    # mẫu ngắn "visual" như pseudo code KHÔNG đủ ở transformers 5.x
+    assert any(should_convert_module(n, ["visual", "lm_head"]) for n in vit)
