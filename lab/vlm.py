@@ -145,8 +145,15 @@ def apply_setup(model, targets="llm", train_projector=False, r=16, alpha=32, dro
     for p in model.parameters():
         p.requires_grad_(False)
     if gradient_checkpointing:
-        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+        # use_reentrant=False + bitsandbytes 4-bit + autocast fp16 trên T4 báo CheckpointError
+        # ("139 tensor lúc forward, 0 lúc recompute"); bản reentrant là cấu hình QLoRA kinh điển.
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": True})
         model.config.use_cache = False
+        # Không checkpoint ViT: E1/E2 ViT đóng băng nên không lưu activation; E3 tốn thêm ~1,4 GB.
+        # (Checkpoint reentrant cần đầu vào requires_grad, mà pixel_values thì không.)
+        for n, m in model.named_modules():
+            if "visual" in n and hasattr(m, "gradient_checkpointing"):
+                m.gradient_checkpointing = False
     model.enable_input_require_grads()
 
     pattern = target_pattern(targets)
@@ -233,6 +240,10 @@ def train(model, dataset, collate_fn, out_dir, lr=2e-4, batch_size=2, grad_accum
             scaler.scale(loss).backward()
             step_loss += loss.item()
         scaler.unscale_(opt)
+        if step == 1:  # mọi tham số huấn luyện phải nhận gradient, nếu không là setup sai
+            no_grad = [n for n, p in model.named_parameters() if p.requires_grad and p.grad is None]
+            if no_grad:
+                raise RuntimeError(f"{len(no_grad)} tham số không có gradient, vd. {no_grad[:3]}")
         gnorm = torch.nn.utils.clip_grad_norm_(params, 1.0).item()
         scaler.step(opt)
         scaler.update()
