@@ -1,0 +1,119 @@
+[
+  {
+    "file": "e0_dung_1.jpg",
+    "kind": "dung",
+    "image_id": "vlcsnap-2025-02-18-23h14m04s766",
+    "tp": 2,
+    "fp": 0,
+    "fn": 0,
+    "valid": true,
+    "gt": [
+      "manhole",
+      "manhole"
+    ],
+    "pred": [
+      "manhole",
+      "manhole"
+    ],
+    "raw": "[{\"label\": \"manhole\", \"bbox_2d\": [885, 696, 1000, 786]}, {\"label\": \"manhole\", \"bbox_2d\": [47, 596, 193, 656]}]"
+  },
+  {
+    "file": "e0_dung_2.jpg",
+    "kind": "dung",
+    "image_id": "vlcsnap-00214",
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "valid": true,
+    "gt": [
+      "manhole"
+    ],
+    "pred": [
+      "manhole"
+    ],
+    "raw": "[{\"label\": \"manhole\", \"bbox_2d\": [817, 734, 900, 776]}]"
+  },
+  {
+    "file": "e0_dung_3.jpg",
+    "kind": "dung",
+    "image_id": "vlcsnap-2025-02-18-23h08m25s146",
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "valid": true,
+    "gt": [
+      "crack"
+    ],
+    "pred": [
+      "crack"
+    ],
+    "raw": "[{\"label\": \"crack\", \"bbox_2d\": [457, 520, 550, 750]}]"
+  },
+  {
+    "file": "e0_sai_1.jpg",
+    "kind": "sai",
+    "image_id": "vlcsnap-2025-02-18-23h30m28s990",
+    "tp": 0,
+    "fp": 3,
+    "fn": 7,
+    "valid": true,
+    "gt": [
+      "pothole",
+      "pothole",
+      "pothole",
+      "pothole",
+      "crack",
+      "crack",
+      "crack"
+    ],
+    "pred": [
+      "crack",
+      "pothole",
+      "pothole"
+    ],
+    "raw": "[{\"label\": \"crack\", \"bbox_2d\": [0, 400, 850, 750]}, {\"label\": \"pothole\", \"bbox_2d\": [143, 630, 400, 720]}, {\"label\": \"pothole\", \"bbox_2d\": [350, 480, 520, 530]}]"
+  },
+  {
+    "file": "e0_sai_2.jpg",
+    "kind": "sai",
+    "image_id": "vlcsnap-2025-02-18-23h30m29s192",
+    "tp": 0,
+    "fp": 3,
+    "fn": 5,
+    "valid": true,
+    "gt": [
+      "crack",
+      "pothole",
+      "pothole",
+      "pothole",
+      "pothole"
+    ],
+    "pred": [
+      "crack",
+      "crack",
+      "crack"
+    ],
+    "raw": "[{\"label\": \"crack\", \"bbox_2d\": [0, 375, 998, 750]}, {\"label\": \"crack\", \"bbox_2d\": [0, 375, 998, 750]}, {\"label\": \"crack\", \"bbox_2d\": [0, 375, 998, 750]}]"
+  },
+  {
+    "file": "e0_sai_3.jpg",
+    "kind": "sai",
+    "image_id": "vlcsnap-2025-02-18-23h24m34s484",
+    "tp": 0,
+    "fp": 3,
+    "fn": 4,
+    "valid": true,
+    "gt": [
+      "crack",
+      "crack",
+      "crack",
+      "crack"
+    ],
+    "pred": [
+      "pothole",
+      "crack",
+      "manhole"
+    ],
+    "raw": "[{\"label\": \"pothole\", \"bbox_2d\": [287, 700, 450, 786]}, {\"label\": \"crack\", \"bbox_2d\": [450, 650, 587, 700]}, {\"label\": \"manhole\", \"bbox_2d\": [820, 650, 960, 700]}]"
+  }
+]
