@@ -137,10 +137,34 @@ def count_params(model):
     return trainable, total
 
 
+def ignore_old_torchao():
+    """Kaggle cài sẵn torchao 0.10; peft 0.21 gặp torchao < 0.16 thì raise ImportError thay vì bỏ qua.
+
+    Lỗi chỉ lộ ra khi gắn LoRA lên nn.Linear thường (ViT ở E3). Lab không dùng torchao nên coi như không có.
+    """
+    import importlib.metadata as md
+    from packaging.version import Version
+    try:
+        if Version(md.version("torchao")) >= Version("0.16.0"):
+            return
+    except md.PackageNotFoundError:
+        return
+    import peft.import_utils
+    import peft.tuners.lora.torchao
+    import peft.utils.quantization_utils
+
+    def unavailable():
+        return False
+    for mod in (peft.import_utils, peft.tuners.lora.torchao, peft.utils.quantization_utils):
+        mod.is_torchao_available = unavailable
+
+
 def apply_setup(model, targets="llm", train_projector=False, r=16, alpha=32, dropout=0.05,
                 gradient_checkpointing=True):
     """E1: targets='llm'. E2: + train_projector. E3: targets='llm+vit' + train_projector."""
     from peft import LoraConfig, get_peft_model
+
+    ignore_old_torchao()
 
     for p in model.parameters():
         p.requires_grad_(False)
@@ -277,6 +301,7 @@ def load_trained(run_dir, model_id=MODEL_ID, is_trainable=False, base=None):
     """
     from peft import PeftModel
 
+    ignore_old_torchao()  # nạp adapter có LoRA ViT (E3) cũng đi qua dispatcher torchao
     run_dir = Path(run_dir)
     model, processor = base if base is not None else load_model(model_id)
     model = PeftModel.from_pretrained(model, run_dir / "adapter", is_trainable=is_trainable)
